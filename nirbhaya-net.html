@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Nirbhaya Net — From SOS Alert to Coordinated Response</title>
+<style>
+:root{--bg:#f6f8fb;--surface:#fff;--navy:#0f2440;--navy-soft:#3c5573;--teal:#0e7c86;--teal-soft:#e3f4f5;--purple:#5b4b9e;--purple-soft:#efeaf9;--red:#c62b2b;--red-soft:#fdecec;--amber:#9a6b00;--amber-soft:#fdf3dc;--green:#1c7a4a;--green-soft:#e7f5ec;--line:#dbe3ec;--radius:16px;--shadow:0 8px 24px rgba(15,36,64,.08)}
+*{box-sizing:border-box}body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--navy);line-height:1.5}
+button{font:inherit;cursor:pointer;border:none;border-radius:12px}a{color:var(--teal)}:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
+header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+.nav{display:flex;align-items:center;gap:14px;padding:12px 0;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.15rem}
+.logo-mark{width:38px;height:38px;border-radius:11px;background:var(--navy);color:#fff;display:grid;place-items:center}
+.logo small{display:block;font-weight:600;color:var(--navy-soft);font-size:.68rem}
+nav{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
+nav button{background:transparent;color:var(--navy-soft);padding:9px 13px;border-radius:10px;font-weight:600}
+nav button:hover{background:var(--teal-soft);color:var(--teal)}
+nav button.active{background:var(--navy);color:#fff}
+.call112{background:var(--red);color:#fff;padding:10px 16px;font-weight:700;border-radius:12px}
+.mode{font-size:.75rem;font-weight:700;padding:6px 10px;border-radius:999px;background:var(--amber-soft);color:var(--amber);border:1px solid #ecd9a8}
+main{padding:28px 0 70px}.page{display:none;animation:fade .25s ease}.page.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+h1{font-size:clamp(1.6rem,3.5vw,2.2rem);margin:.2em 0}h2{font-size:1.25rem;margin:0 0 6px}
+.sub{color:var(--navy-soft);max-width:640px;margin:0 0 22px}
+.grid{display:grid;gap:18px}.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+.sos-grid{grid-template-columns:1.15fr .85fr}@media(max-width:860px){.sos-grid{grid-template-columns:1fr}}
+.sos-btn{width:100%;min-height:150px;background:var(--red);color:#fff;font-size:clamp(1.4rem,4vw,2rem);font-weight:800;border-radius:20px;box-shadow:0 10px 26px rgba(198,43,43,.28)}
+.sos-btn:hover{background:#b32525}.sos-btn:disabled{background:#9aa7b5;box-shadow:none;cursor:not-allowed}
+.sos-note{font-size:.85rem;color:var(--navy-soft);margin:10px 0 0}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:.76rem;font-weight:700;padding:5px 10px;border-radius:999px}
+.chip.ok{background:var(--green-soft);color:var(--green)}.chip.warn{background:var(--amber-soft);color:var(--amber)}
+.chip.bad{background:var(--red-soft);color:var(--red)}.chip.info{background:var(--teal-soft);color:var(--teal)}.chip.sim{background:var(--purple-soft);color:var(--purple)}
+.field{margin-bottom:14px}label{display:block;font-weight:600;font-size:.85rem;margin-bottom:5px}
+input,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;background:#fff;color:var(--navy)}
+input:focus,select:focus{border-color:var(--teal);outline:none;box-shadow:0 0 0 3px rgba(14,124,134,.15)}
+.btn{padding:11px 16px;font-weight:700;border-radius:12px}
+.btn.primary{background:var(--teal);color:#fff}.btn.primary:hover{background:#0a646d}
+.btn.ghost{background:#fff;border:1px solid var(--line);color:var(--navy)}.btn.ghost:hover{background:var(--teal-soft)}
+.btn.danger{background:var(--red);color:#fff}.btn.small{padding:7px 11px;font-size:.82rem;border-radius:9px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.contact{display:flex;justify-content:space-between;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-bottom:10px;background:#fff}
+.contact .meta{font-size:.8rem;color:var(--navy-soft)}
+.badge{font-size:.68rem;font-weight:800;padding:3px 8px;border-radius:999px;background:var(--purple-soft);color:var(--purple)}
+.badge.primary{background:var(--teal-soft);color:var(--teal)}.badge.backup{background:var(--amber-soft);color:var(--amber)}
+.timeline{list-style:none;margin:0;padding:0}
+.timeline li{position:relative;padding:0 0 20px 30px;border-left:2px solid var(--line);margin-left:10px}
+.timeline li:last-child{border-left-color:transparent;padding-bottom:0}
+.timeline li::before{content:"";position:absolute;left:-9px;top:2px;width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid var(--line)}
+.timeline li.done::before{border-color:var(--teal);background:var(--teal)}
+.timeline li.active::before{border-color:var(--purple);background:#fff;box-shadow:0 0 0 4px var(--purple-soft)}
+.timeline li.failed::before{border-color:var(--red);background:var(--red)}
+.timeline .t-title{font-weight:700}.timeline .t-detail{font-size:.85rem;color:var(--navy-soft)}
+.countdown{font-variant-numeric:tabular-nums;font-size:2rem;font-weight:800;color:var(--purple)}
+.sim-banner{background:var(--purple-soft);border:1px dashed var(--purple);color:var(--purple);font-weight:700;font-size:.82rem;padding:10px 14px;border-radius:12px;margin-bottom:16px}
+.empty{border:1px dashed var(--line);border-radius:12px;padding:22px;text-align:center;color:var(--navy-soft)}
+.resource{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px;background:#fff}
+.resource h3{margin:0 0 4px;font-size:1.02rem}.resource .src{font-size:.75rem;color:var(--navy-soft)}
+.guide-grid{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.guide-card{border-top:4px solid var(--teal)}.guide-card.red{border-top-color:var(--red)}.guide-card.purple{border-top-color:var(--purple)}
+footer{border-top:1px solid var(--line);padding:24px 0;color:var(--navy-soft);font-size:.85rem;text-align:center}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:12px 20px;border-radius:12px;font-weight:600;box-shadow:var(--shadow);z-index:100;opacity:0;transition:opacity .3s;pointer-events:none;max-width:90vw;text-align:center}
+.toast.show{opacity:1}
+.demo-panel{background:var(--navy);color:#fff;border-radius:var(--radius);padding:18px 22px;margin-bottom:18px}
+.demo-panel .btn{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.3)}
+.demo-panel .btn:hover{background:rgba(255,255,255,.25)}.demo-panel h2{color:#fff}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="nav">
+  <div class="logo"><div class="logo-mark">NN</div><div>Nirbhaya Net<small>From SOS Alert to Coordinated Response</small></div></div>
+  <span class="mode" id="modeChip">DEMO MODE — no real alerts sent</span>
+  <nav>
+    <button data-page="dashboard" class="active">Dashboard</button>
+    <button data-page="circle">Safety Circle</button>
+    <button data-page="finder">Support Finder</button>
+    <button data-page="guide">Safety Guide</button>
+  </nav>
+  <a href="tel:112"><button class="call112">Call 112</button></a>
+</div></div></header>
+
+<main class="wrap">
+
+<section id="dashboard" class="page active">
+  <div class="demo-panel">
+    <h2>Judge demo panel</h2>
+    <p style="margin:.2em 0 12px;font-size:.88rem;color:#c8d4e4">All SOS events below are simulated. No SMS, push notification, contact message, or emergency dispatch is sent.</p>
+    <div class="row">
+      <button class="btn small" onclick="demoAdvance('sent')">Simulate: alert sent</button>
+      <button class="btn small" onclick="demoAdvance('delivered')">Simulate: delivered</button>
+      <button class="btn small" onclick="demoAdvance('ack')">Simulate: acknowledged</button>
+      <button class="btn small" onclick="demoAdvance('fail')">Simulate: delivery failed</button>
+      <button class="btn small" onclick="demoAdvance('timeout')">Simulate: no ack → escalate</button>
+      <button class="btn small" onclick="cancelSos(true)">End test flow</button>
+    </div>
+  </div>
+  <h1>Emergency SOS</h1>
+  <p class="sub">Press SOS only when you want to start a safety response. Your trusted contacts are coordinated, and you can call 112 at any time. This prototype runs in Demo Mode.</p>
+  <div class="grid sos-grid">
+    <div class="card">
+      <div class="sim-banner">SIMULATED — NO REAL ALERT SENT</div>
+      <button id="sosBtn" class="sos-btn" onclick="startSos()">ACTIVATE SOS</button>
+      <p class="sos-note">Start a safety response and coordinate your trusted contacts. Calling 112 remains available independently.</p>
+      <div class="row" style="margin-top:16px">
+        <span class="chip" id="locChip">Location: not requested</span>
+        <button class="btn small ghost" onclick="requestLocation()">Enable location</button>
+      </div>
+      <div id="locPreview" class="hidden" style="margin-top:10px;font-size:.85rem;color:var(--navy-soft)"></div>
+      <div style="margin-top:16px;display:grid;gap:8px">
+        <div><strong>Primary contact:</strong> <span id="primaryName">Not set</span></div>
+        <div><strong>Backup contact:</strong> <span id="backupName">Not set</span></div>
+        <div><strong>Alert status:</strong> <span id="statusChip" class="chip info">Idle</span></div>
+      </div>
+      <div class="row" style="margin-top:16px">
+        <a href="tel:112"><button class="btn danger">Call 112</button></a>
+        <button class="btn ghost" onclick="cancelSos(true)" id="cancelBtn" disabled>Cancel / end test</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Response timeline</h2>
+      <p class="sub" style="margin-bottom:14px;font-size:.85rem">States reflect this demo simulation only. “Contact selected” does not mean an alert was sent.</p>
+      <div id="countdownWrap" class="hidden" style="text-align:center;margin-bottom:14px">
+        <div style="font-size:.8rem;font-weight:700;color:var(--purple)">BACKUP ESCALATION IN</div>
+        <div class="countdown" id="countdown">10</div>
+      </div>
+      <ul class="timeline" id="timeline"></ul>
+      <div id="noAckNote" class="hidden" style="margin-top:12px;background:var(--amber-soft);color:var(--amber);padding:10px 14px;border-radius:10px;font-size:.85rem;font-weight:600">No acknowledgement received yet. This does not mean help has arrived.</div>
+    </div>
+  </div>
+</section>
+
+<section id="circle" class="page">
+  <h1>Safety Circle</h1>
+  <p class="sub">Add trusted people and set your escalation order. Contacts are stored only in this browser’s local storage for this prototype — they are not stored on a backend and are not shared with anyone.</p>
+  <div class="grid" style="grid-template-columns:1fr 1.3fr">
+    <div class="card">
+      <h2>Add contact</h2>
+      <div class="field"><label for="cName">Name</label><input id="cName" placeholder="e.g. Aditi Sharma"/></div>
+      <div class="field"><label for="cRel">Relationship</label><input id="cRel" placeholder="e.g. Sister / Friend / Roommate"/></div>
+      <div class="field"><label for="cPhone">Phone number</label><input id="cPhone" placeholder="e.g. +91 98765 43210"/></div>
+      <div class="field"><label for="cPriority">Priority</label>
+        <select id="cPriority"><option value="primary">Primary</option><option value="backup">Backup</option><option value="standard">Standard</option></select>
+      </div>
+      <button class="btn primary" onclick="addContact()">Add contact</button>
+      <p style="font-size:.78rem;color:var(--navy-soft);margin-top:12px">Sample contacts below are pre-filled for demonstration and clearly labelled as sample data.</p>
+    </div>
+    <div class="card"><h2>Your escalation order</h2><div id="contactList"></div></div>
+  </div>
+</section>
+
+<section id="finder" class="page">
+  <h1>Support Finder</h1>
+  <p class="sub">Discover nearby support resources using <strong>live TinyFish Search + Fetch</strong>. This feature is separate from SOS — a slow or failed search never blocks SOS or Call 112.</p>
+  <div class="card">
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+      <div class="field"><label for="fLoc">Location / area</label><input id="fLoc" placeholder="e.g. Delhi, Kashmere Gate"/></div>
+      <div class="field"><label for="fCat">Support category</label>
+        <select id="fCat"><option>Nearby hospitals</option><option>Women’s support organisations</option><option>Legal aid</option><option>Counselling / mental health</option></select>
+      </div>
+      <div class="field" style="align-self:end"><button class="btn primary" style="width:100%" onclick="searchSupport()">Search resources</button></div>
+    </div>
+    <div class="field" style="margin-top:14px">
+      <label for="tfKey">TinyFish API key <span style="font-weight:400;color:var(--navy-soft)">(stored only in this browser; leave blank for mock mode)</span></label>
+      <input id="tfKey" type="password" placeholder="Paste your TinyFish X-API-Key to enable live Search + Fetch"/>
+    </div>
+    <div id="tfStatus" class="chip info" style="margin-top:6px">TinyFish: mock mode (no API key)</div>
+  </div>
+  <div id="finderResults" style="margin-top:18px"></div>
+</section>
+
+<section id="guide" class="page">
+  <h1>Safety Guide</h1>
+  <p class="sub">Practical, calm guidance. Nirbhaya Net is a supplementary coordination tool — you can contact emergency services directly at any time.</p>
+  <div class="grid guide-grid">
+    <div class="card guide-card red"><h2>In immediate danger</h2><p>Call <a href="tel:112">112</a> directly. If you can, move to a populated, well-lit place and share your live location only with someone you trust.</p></div>
+    <div class="card guide-card"><h2>Prepare your circle</h2><p>Choose contacts who can respond quickly, confirm they consent to being contacted, and agree on what an SOS from you means.</p></div>
+    <div class="card guide-card purple"><h2>Know your route</h2><p>Share your expected route and arrival time with a trusted contact when travelling, especially at night or in unfamiliar areas.</p></div>
+    <div class="card guide-card"><h2>Trust your judgement</h2><p>If a situation feels unsafe, it is reasonable to leave, seek help, or ask for company. No tip guarantees safety — prioritise getting to support.</p></div>
+    <div class="card guide-card purple"><h2>After an incident</h2><p>Reach out to someone you trust, preserve relevant information if you choose to report, and consider professional support. Seeking help is a strength.</p></div>
+    <div class="card guide-card red"><h2>Emergency numbers</h2><p><strong>112</strong> — India’s national emergency helpline. Nirbhaya Net does not replace 112; it adds a coordination layer for your trusted circle.</p></div>
+  </div>
+</section>
+
+</main>
+<footer>Nirbhaya Net · Team Syntax Squad, IGDTUW · KRITICAL HACKS ’26<br/>Prototype: SOS Demo Mode only. TinyFish Search + Fetch is live when an API key is provided; no backend, messaging provider, or emergency dispatch is connected in this build.</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+let contacts=[
+ {id:1,name:"Aditi Sharma",rel:"Sister",phone:"+91 98765 43210",priority:"primary",sample:true},
+ {id:2,name:"Meera Iyer",rel:"Close friend",phone:"+91 91234 56780",priority:"backup",sample:true},
+ {id:3,name:"Prof. R. Kapoor",rel:"Faculty mentor",phone:"+91 90000 11223",priority:"standard",sample:true}
+];
+try{const s=localStorage.getItem("nn_contacts");if(s)contacts=JSON.parse(s);}catch(e){}
+let sosState="idle",countdownTimer=null;
+
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2600);}
+function esc(s){return String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));}
+function saveContacts(){try{localStorage.setItem("nn_contacts",JSON.stringify(contacts));}catch(e){}}
+function renderContacts(){
+  const el=$("contactList");
+  if(!contacts.length){el.innerHTML='<div class="empty">No trusted contacts yet. Add one to configure your escalation order.</div>';updateSosContacts();return;}
+  el.innerHTML=contacts.map(c=>`<div class="contact"><div><strong>${esc(c.name)}</strong> ${c.sample?'<span class="chip sim">SAMPLE</span>':''}<br/><span class="meta">${esc(c.rel)} · ${esc(c.phone)}</span></div><div class="row"><span class="badge ${c.priority}">${c.priority.toUpperCase()}</span><button class="btn small ghost" onclick="removeContact(${c.id})">Remove</button></div></div>`).join("");
+  updateSosContacts();
+}
+function addContact(){
+  const n=$("cName").value.trim(),r=$("cRel").value.trim(),p=$("cPhone").value.trim(),pr=$("cPriority").value;
+  if(!n||!p){toast("Please enter a name and phone number.");return;}
+  if(!/^[+\d][\d\s\-()]{6,}$/.test(p)){toast("Please enter a valid phone number.");return;}
+  if(pr==="primary")contacts.forEach(c=>{if(c.priority==="primary")c.priority="standard";});
+  if(pr==="backup")contacts.forEach(c=>{if(c.priority==="backup")c.priority="standard";});
+  contacts.push({id:Date.now(),name:n,rel:r||"Trusted contact",phone:p,priority:pr,sample:false});
+  saveContacts();renderContacts();$("cName").value=$("cRel").value=$("cPhone").value="";
+  toast("Contact added locally in this browser.");
+}
+function removeContact(id){contacts=contacts.filter(c=>c.id!==id);saveContacts();renderContacts();toast("Contact removed.");}
+function updateSosContacts(){
+  const p=contacts.find(c=>c.priority==="primary"),b=contacts.find(c=>c.priority==="backup");
+  $("primaryName").textContent=p?`${p.name} (${p.phone})`:"Not set — add one in Safety Circle";
+  $("backupName").textContent=b?`${b.name} (${b.phone})`:"Not configured";
+}
+function setStatus(txt,cls){const c=$("statusChip");c.textContent=txt;c.className="chip "+cls;}
+function renderTimeline(steps){$("timeline").innerHTML=steps.map(s=>`<li class="${s.cls||''}"><div class="t-title">${s.title}</div><div class="t-detail">${s.detail||''}</div></li>`).join("");}
+function idleTimeline(){renderTimeline([
+ {title:"SOS initiated",detail:"Press ACTIVATE SOS to begin."},
+ {title:"Primary contact selected",detail:"From your Safety Circle."},
+ {title:"Alert delivery",detail:"Not started (demo)."},
+ {title:"Acknowledgement",detail:"Awaiting SOS initiation."},
+ {title:"Backup escalation",detail:"Only if enabled and no acknowledgement arrives."}
+]);}
+function startSos(){
+  if(sosState!=="idle")return;
+  const p=contacts.find(c=>c.priority==="primary");
+  if(!p){toast("Add a primary contact in Safety Circle first.");return;}
+  sosState="initiated";$("sosBtn").disabled=true;$("cancelBtn").disabled=false;
+  setStatus("SOS initiated — awaiting delivery","warn");
+  renderTimeline([
+   {title:"SOS initiated",detail:"You pressed ACTIVATE SOS. Simulated event — no real alert sent.",cls:"done"},
+   {title:"Primary contact selected",detail:`${p.name} · ${p.phone}`,cls:"done"},
+   {title:"Sending alert",detail:"Simulated delivery in progress…",cls:"active"},
+   {title:"Acknowledgement",detail:"Pending."},
+   {title:"Backup escalation",detail:"Will trigger only if configured and no acknowledgement arrives."}
+  ]);
+  toast("SOS flow started — SIMULATED, no real alert sent.");
+  setTimeout(()=>{if(sosState==="initiated")demoAdvance("sent");},1400);
+}
+function demoAdvance(step){
+  if(sosState==="idle"){toast("Press ACTIVATE SOS first to start the demo flow.");return;}
+  const p=contacts.find(c=>c.priority==="primary"),b=contacts.find(c=>c.priority==="backup");
+  if(step==="sent"){
+    sosState="sent";setStatus("Alert sent — awaiting acknowledgement","info");
+    renderTimeline([
+     {title:"SOS initiated",detail:"You initiated the flow.",cls:"done"},
+     {title:"Primary contact selected",detail:`${p.name} · ${p.phone}`,cls:"done"},
+     {title:"Alert sent",detail:"SIMULATED — no real message was transmitted.",cls:"done"},
+     {title:"Awaiting acknowledgement",detail:"No acknowledgement received yet. This does not mean help has arrived.",cls:"active"},
+     {title:"Backup escalation",detail:b?"Backup configured: "+b.name:"No backup contact configured."}
+    ]);
+    $("noAckNote").classList.remove("hidden");startCountdown();
+  }else if(step==="delivered"){
+    if(sosState!=="sent"&&sosState!=="escalated"){toast("Simulate ‘alert sent’ first.");return;}
+    sosState="delivered";setStatus("Delivered — awaiting acknowledgement","info");
+    const li=[...document.querySelectorAll("#timeline li")];li[2].querySelector(".t-detail").textContent="SIMULATED delivery receipt recorded.";li[3].classList.add("active");
+    toast("Simulated delivery receipt — not a real provider event.");
+  }else if(step==="ack"){
+    stopCountdown();sosState="ack";setStatus("Acknowledged by primary contact","ok");
+    renderTimeline([
+     {title:"SOS initiated",detail:"You initiated the flow.",cls:"done"},
+     {title:"Primary contact selected",detail:`${p.name} · ${p.phone}`,cls:"done"},
+     {title:"Alert sent & delivered",detail:"SIMULATED provider events.",cls:"done"},
+     {title:"Acknowledged",detail:"SIMULATED acknowledgement — no real person was contacted.",cls:"done"},
+     {title:"Backup escalation",detail:"Not required — acknowledgement received.",cls:"done"}
+    ]);
+    $("noAckNote").classList.add("hidden");toast("Simulated acknowledgement recorded.");
+  }else if(step==="fail"){
+    stopCountdown();sosState="failed";setStatus("Delivery failed — escalation available","bad");
+    renderTimeline([
+     {title:"SOS initiated",detail:"You initiated the flow.",cls:"done"},
+     {title:"Primary contact selected",detail:`${p.name} · ${p.phone}`,cls:"done"},
+     {title:"Delivery failed",detail:"SIMULATED failure — no real provider event.",cls:"failed"},
+     {title:"Backup escalation",detail:b?"Backup contact selected: "+b.name+" (simulated).":"No backup contact configured.",cls:"active"},
+     {title:"Acknowledgement",detail:"Not received."}
+    ]);
+    toast("Simulated delivery failure — backup escalation shown.");
+  }else if(step==="timeout"){
+    if(sosState!=="sent"&&sosState!=="delivered"){toast("Simulate ‘alert sent’ first.");return;}
+    stopCountdown();sosState="escalated";setStatus("Backup escalation pending","warn");
+    renderTimeline([
+     {title:"SOS initiated",detail:"You initiated the flow.",cls:"done"},
+     {title:"Primary contact selected",detail:`${p.name} · ${p.phone}`,cls:"done"},
+     {title:"Alert sent",detail:"SIMULATED — no real message transmitted.",cls:"done"},
+     {title:"No acknowledgement received",detail:"This does not mean help has arrived.",cls:"failed"},
+     {title:"Backup escalation",detail:b?`Backup contact selected: ${b.name} · ${b.phone} — SIMULATED notification.`:"No backup contact configured — add one in Safety Circle.",cls:"active"}
+    ]);
+    toast("Simulated escalation to backup contact — no real notification sent.");
+  }
+}
+function startCountdown(){
+  if(!contacts.find(c=>c.priority==="backup"))return;
+  let n=10;$("countdownWrap").classList.remove("hidden");$("countdown").textContent=n;
+  countdownTimer=setInterval(()=>{n--;$("countdown").textContent=n;if(n<=0){stopCountdown();demoAdvance("timeout");}},1000);
+}
+function stopCountdown(){if(countdownTimer){clearInterval(countdownTimer);countdownTimer=null;}$("countdownWrap").classList.add("hidden");}
+function cancelSos(confirmIt){
+  if(sosState==="idle")return;
+  if(confirmIt&&!window.confirm("End this SIMULATED test flow? No real alert was sent."))return;
+  stopCountdown();sosState="idle";$("sosBtn").disabled=false;$("cancelBtn").disabled=true;
+  setStatus("Idle","info");idleTimeline();$("noAckNote").classList.add("hidden");
+  toast("Test flow ended. No real alert was sent at any point.");
+}
+function requestLocation(){
+  if(!navigator.geolocation){$("locChip").textContent="Location: unavailable";$("locChip").className="chip bad";return;}
+  $("locChip").textContent="Location: requesting…";$("locChip").className="chip warn";
+  navigator.geolocation.getCurrentPosition(pos=>{
+    $("locChip").textContent="Location available on this device";$("locChip").className="chip ok";
+    $("locPreview").classList.remove("hidden");
+    $("locPreview").innerHTML=`Approx. coordinates: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}.<br/><strong>Not shared</strong> with any contact or service — sharing requires your explicit consent.`;
+  },()=>{$("locChip").textContent="Location: permission denied / unavailable";$("locChip").className="chip bad";},{timeout:8000});
+}
+
+/* ===== TinyFish live integration ===== */
+const TF_SEARCH="https://api.search.tinyfish.ai";
+const TF_FETCH="https://api.fetch.tinyfish.ai";
+
+async function searchSupport(){
+  const loc=$("fLoc").value.trim()||"Delhi",cat=$("fCat").value,res=$("finderResults"),key=$("tfKey").value.trim(),st=$("tfStatus");
+  if(key)localStorage.setItem("tf_key",key);else localStorage.removeItem("tf_key");
+  if(!key){
+    res.innerHTML='<div class="card" style="border-left:4px solid var(--amber)"><strong>Mock mode active.</strong><p style="color:var(--navy-soft);font-size:.88rem">Paste a TinyFish API key above to run live Search + Fetch. SOS and Call 112 remain fully available regardless.</p></div>';
+    return;
+  }
+  res.innerHTML='<div class="card"><strong>Searching via TinyFish…</strong><p style="color:var(--navy-soft);font-size:.88rem">Running TinyFish Search, then Fetch on top results. SOS and Call 112 remain fully available during this search.</p></div>';
+  st.textContent="TinyFish: searching…";st.className="chip warn";
+  const query=`${cat} near ${loc} India`;
+  try{
+    const ctrl=new AbortController();const to=setTimeout(()=>ctrl.abort(),12000);
+    const sr=await fetch(`${TF_SEARCH}?query=${encodeURIComponent(query)}&location=IN&language=en`,{headers:{"X-API-Key":key},signal:ctrl.signal});
+    clearTimeout(to);
+    if(!sr.ok)throw new Error("Search failed (HTTP "+sr.status+")");
+    const data=await sr.json();
+    const results=(data.results||data.organic||[]).slice(0,4);
+    if(!results.length){res.innerHTML='<div class="empty">No results found for this query. Try a broader location or category.</div>';st.textContent="TinyFish: no results";st.className="chip warn";return;}
+    st.textContent="TinyFish: fetching page details…";st.className="chip warn";
+    const urls=results.slice(0,3).map(r=>r.url);
+    let fetched={};
+    try{
+      const fc=new AbortController();const fto=setTimeout(()=>fc.abort(),15000);
+      const fr=await fetch(TF_FETCH,{method:"POST",headers:{"X-API-Key":key,"Content-Type":"application/json"},body:JSON.stringify({urls}),signal:fc.signal});
+      clearTimeout(fto);
+      if(fr.ok){const fd=await fr.json();(fd.results||[]).forEach(r=>{fetched[r.url]=r;});}
+    }catch(e){}
+    res.innerHTML=`<div class="card"><h2>Live TinyFish results for “${esc(cat)}” near “${esc(loc)}”</h2><p style="font-size:.82rem;color:var(--navy-soft)">Sources retrieved via TinyFish Search; page content via TinyFish Fetch where available. Information found online is <strong>not independently verified</strong> — confirm details directly with each organisation.</p></div>`+
+    results.map(r=>{
+      const f=fetched[r.url];
+      const snippet=f&&f.text?f.text.slice(0,220)+"…":(r.snippet||r.description||"Content preview unavailable — open the source link to verify.");
+      const fetchChip=f?'<span class="chip ok">Fetch: content retrieved</span>':'<span class="chip warn">Fetch: unavailable</span>';
+      let host="source";try{host=new URL(r.url).hostname;}catch(e){}
+      return `<div class="resource"><h3><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.title||r.url)}</a></h3><p style="margin:.2em 0">${esc(snippet)}</p><div class="src">Source: ${esc(r.site_name||host)} · <a href="${esc(r.url)}" target="_blank" rel="noopener">Open source</a> · ${fetchChip} · Verification: <strong>Unverified — found via search</strong></div></div>`;
+    }).join("");
+    st.textContent="TinyFish: live results ("+results.length+")";st.className="chip ok";
+  }catch(e){
+    const msg=e.name==="AbortError"?"Request timed out.":"TinyFish request failed: "+e.message;
+    res.innerHTML=`<div class="card" style="border-left:4px solid var(--red)"><strong>Search unavailable.</strong><p style="color:var(--navy-soft);font-size:.88rem">${esc(msg)} SOS and Call 112 remain fully functional. Check your API key or try again.</p></div>`;
+    st.textContent="TinyFish: error — SOS unaffected";st.className="chip bad";
+  }
+}
+
+document.querySelectorAll("nav button[data-page]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  b.classList.add("active");$(b.dataset.page).classList.add("active");
+});
+try{const k=localStorage.getItem("tf_key");if(k){$("tfKey").value=k;$("tfStatus").textContent="TinyFish: API key saved — live mode ready";$("tfStatus").className="chip ok";}}catch(e){}
+renderContacts();idleTimeline();
+</script>
+</body>
+</html>
